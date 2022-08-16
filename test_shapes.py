@@ -1,4 +1,4 @@
-from shapes import Circle, Square
+from modules.shapes import Circle, Square
 
 
 def main() -> None:
