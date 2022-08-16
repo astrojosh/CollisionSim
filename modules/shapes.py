@@ -7,7 +7,7 @@ class Shape:
     This is a class for creating shapes.
 
     Attributes:
-        points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y)
+        points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y).
     """
 
     def __init__(self, points: None = None) -> None:
@@ -15,7 +15,7 @@ class Shape:
         The constructor for Shape class.
 
         Parameters:
-            points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y)
+            points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y).
         """
 
         if points:
@@ -28,7 +28,7 @@ class Shape:
         The function to add points to the shape.
 
         Parameters:
-            new_points (list[tuple[float, float]]): The list of points to be added to the shape in the form (x, y)
+            new_points (list[tuple[float, float]]): The list of points to be added to the shape in the form (x, y).
 
         # Returns:
         #     ComplexNumber: A complex number which contains the sum.
@@ -36,11 +36,31 @@ class Shape:
 
         self.points += new_points
 
+    def rotate_points(self, rot: float) -> None:
+        """
+        The function to rotate the points of the shape.
+
+        Parameters:
+            rot (float): The angle, in radians, to rotate the shape.
+        """
+
+        self.rot = rot
+
+        for i, (x, y) in enumerate(self.points):
+            x = x * np.cos(self.rot) - y * np.sin(self.rot)
+            y = x * np.sin(self.rot) + y * np.cos(self.rot)
+            self.points[i] = (x, y)
+
     def plot_shape(self) -> None:
         """The function to plot the shape."""
 
-        plt.figure(figsize=(15, 15))
         plt.scatter([x for x, _ in self.points], [y for _, y in self.points])
+
+    def show_shape_plot(self) -> None:
+        """The function to show the plot of the shape."""
+
+        plt.figure(figsize=(15, 15))
+        self.plot_shape()
         plt.show()
 
 
@@ -68,7 +88,7 @@ class Circle(Shape):
         The function to generate the points for the Circle object.
 
         Parameters:
-            point_density (float): The density of the points generated for the surface of the shape.
+            point_density (float): The density of the points generated for the surface of the shape. Default = 100.
         """
 
         self.point_density = point_density
@@ -88,6 +108,7 @@ class Square(Shape):
 
     Attributes:
         width (float): The width of the square.
+        rot (float): The rotation of the square in radians.
     """
 
     def __init__(self, width: float) -> None:
@@ -95,7 +116,7 @@ class Square(Shape):
         The constructor for Square class, which is a subclass of the Shape class.
 
         Parameters:
-            width (float): The width of the circle.
+            width (float): The width of the square.
         """
 
         super().__init__()
@@ -106,7 +127,7 @@ class Square(Shape):
         The function to generate the points for the Square object.
 
         Parameters:
-            point_density (float): The density of the points generated for the surface of the shape.
+            point_density (float): The density of the points generated for the surface of the shape. Default = 100.
         """
 
         self.point_density = point_density
