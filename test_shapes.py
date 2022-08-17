@@ -1,29 +1,17 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from modules.shapes import Circle, Square
+from modules.shapes import Collider, Circle, Square
 
 
 def main() -> None:
-    c = Circle(radius=1)
-    c.gen_points()
-    # c.show_shape_plot()
 
-    s = Square(width=1)
-    s.gen_points()
-    # s.show_shape_plot()
+    c: Circle = Circle(radius=1)
 
-    c1 = Circle(radius=1)
-    c1.gen_points()
-    c1.rotate_points(rot=np.pi / 4)
+    s: Square = Square(width=1.5)
+    s.rotate_points(rot=np.pi / 6)
+    s.set_origin(1, 1)
 
-    s1 = Square(width=1)
-    s1.gen_points()
-    s1.rotate_points(rot=np.pi / 4)
-
-    plt.figure(figsize=(15, 15))
-    c1.plot_shape()
-    c.plot_shape()
-    plt.show()
+    col: Collider = Collider(c, s)
+    col.show_shape_plot()
 
 
 if __name__ == "__main__":

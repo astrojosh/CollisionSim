@@ -1,16 +1,55 @@
+from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Shape:
+class Collider:
+    """
+    This is a class for creating colliders, made up of multiple shapes.
+
+    Attributes:
+        shapes (tuple[Shape]): List of Shape objects that make up the container.
+        points (list[tuple[float, float]]): List of points of the surface of the collider in the form (x, y).
+    """
+
+    def __init__(self, *shapes: Shape) -> None:
+        """
+        The constructor for Collider class.
+
+        Parameters:
+            shapes (tuple[Shape]): List of Shape objects that make up the container.
+        """
+        self.shapes = shapes
+
+        self.points: list[tuple[float, float]] = []
+        for shape in self.shapes:
+            self.points += shape.points
+
+    def plot_shape(self) -> None:
+        """The function to plot the shape."""
+
+        plt.scatter([x for x, _ in self.points], [y for _, y in self.points])
+
+    def show_shape_plot(self) -> None:
+        """The function to show the plot of the shape."""
+
+        plt.figure(figsize=(15, 15))
+        self.plot_shape()
+        plt.show()
+
+
+class Shape(Collider):
     """
     This is a class for creating shapes.
 
     Attributes:
         points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y).
+        rot (float): The angle, in radians, to rotate the shape.
+        x_origin (float): The x position of the origin of the shape.
+        y_origin (float): The y position of the origin of the shape.
     """
 
-    def __init__(self, points: None = None) -> None:
+    def __init__(self, points: list[tuple[float, float]] | None = None) -> None:
         """
         The constructor for Shape class.
 
@@ -18,10 +57,12 @@ class Shape:
             points (list[tuple[float, float]]): List of points of the surface of the shape in the form (x, y).
         """
 
+        super().__init__()
+
         if points:
-            self.points: list[tuple[float, float]] = points
+            self.points = points
         else:
-            self.points: list[tuple[float, float]] = []
+            self.points = []
 
     def add_points(self, new_points: list[tuple[float, float]]) -> None:
         """
@@ -47,21 +88,28 @@ class Shape:
         self.rot = rot
 
         for i, (x, y) in enumerate(self.points):
-            x = x * np.cos(self.rot) - y * np.sin(self.rot)
-            y = x * np.sin(self.rot) + y * np.cos(self.rot)
-            self.points[i] = (x, y)
+            x_rot: float = x * np.cos(self.rot) - y * np.sin(self.rot)
+            y_rot: float = x * np.sin(self.rot) + y * np.cos(self.rot)
+            self.points[i] = (x_rot, y_rot)
 
-    def plot_shape(self) -> None:
-        """The function to plot the shape."""
+    def set_origin(self, x_origin: float, y_origin: float) -> None:
+        """
+        The function to set the origin shape.
 
-        plt.scatter([x for x, _ in self.points], [y for _, y in self.points])
+        Parameters:
+            x_origin (float): The x position of the origin of the shape.
+            y_origin (float): The y position of the origin of the shape.
+        """
 
-    def show_shape_plot(self) -> None:
-        """The function to show the plot of the shape."""
+        self.x_origin = x_origin
+        self.y_origin = y_origin
 
-        plt.figure(figsize=(15, 15))
-        self.plot_shape()
-        plt.show()
+        self.points = list(
+            zip(
+                [x + self.x_origin for x, _ in self.points],
+                [y + self.y_origin for _, y in self.points],
+            )
+        )
 
 
 class Circle(Shape):
@@ -70,18 +118,26 @@ class Circle(Shape):
 
     Attributes:
         radius (float): The radius of the circle.
+        point_density (float): The density of the points generated for the surface of the shape. Default = 100.
     """
 
-    def __init__(self, radius: float) -> None:
+    def __init__(
+        self, radius: float, gen_points: bool = True, point_density: float = 100
+    ) -> None:
         """
         The constructor for Circle class, which is a subclass of the Shape class.
 
         Parameters:
             radius (float): The radius of the circle.
+            gen_points (bool): The condition whether the initialiser should auto-generate the shape points. Default = True.
+            point_density (float): The density of the points generated for the surface of the shape. Default = 100.
         """
 
         super().__init__()
         self.radius = radius
+
+        if gen_points:
+            self.gen_points(point_density)
 
     def gen_points(self, point_density: float = 100) -> None:
         """
@@ -94,7 +150,7 @@ class Circle(Shape):
         self.point_density = point_density
 
         # Generate points equally spaced around the surface of the circle
-        t = np.linspace(0, 2 * np.pi, int(self.point_density * self.radius))
+        t = np.linspace(0, 2 * np.pi, int(np.pi * self.point_density * self.radius))
         x = self.radius * np.cos(t)
         y = self.radius * np.sin(t)
 
@@ -108,19 +164,26 @@ class Square(Shape):
 
     Attributes:
         width (float): The width of the square.
-        rot (float): The rotation of the square in radians.
+        point_density (float): The density of the points generated for the surface of the shape. Default = 100.
     """
 
-    def __init__(self, width: float) -> None:
+    def __init__(
+        self, width: float, gen_points: bool = True, point_density: float = 100
+    ) -> None:
         """
         The constructor for Square class, which is a subclass of the Shape class.
 
         Parameters:
             width (float): The width of the square.
+            gen_points (bool): The condition whether the initialiser should auto-generate the shape points. Default = True.
+            point_density (float): The density of the points generated for the surface of the shape. Default = 100.
         """
 
         super().__init__()
         self.width = width
+
+        if gen_points:
+            self.gen_points(point_density)
 
     def gen_points(self, point_density: float = 100) -> None:
         """
