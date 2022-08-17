@@ -1,46 +1,53 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from modules.shapes import Collider, Circle, Square
 
-plt.rcParams.update({'font.size': 22})
+plt.rcParams.update({"font.size": 22})
 
-# Create a shape to collide with the ball
-# Possible options are "Circle" and "Ellipse"
-class Shape:
-    
-    param1 = 0
-    param2 = 0
-    max_limit = 0
-    x_range = []
+c = Circle(1)
+c.gen_points()
+c.plot_shape()
 
-    def __init__(self, shape):
-        self.shape = shape
+s = Square(1)
+s.gen_points()
+s.plot_shape()
 
-    def gen_range(self, data_points=100):
+# Create a collider to collide with the ball
+@dataclass
+class Collider:
+
+    shape: str
+    param1: float = 0
+    param2: float = 0
+    max_limit: float = 0
+    x_range: np.ndarray[float, float] = field(default_factory=np.ndarray)
+
+    def gen_range(self, data_points: int = 100):
         self.x_range = np.linspace(-self.max_limit, self.max_limit, data_points)
 
     def get_range(self):
         return self.x_range
 
-    def eq(self, range):
+    def eq(self, range: np.ndarray[float, Any]) -> np.ndarray[float, Any]:
         if self.shape == "Circle":
             return np.sqrt(self.param1**2 - range**2)
         elif self.shape == "Ellipse":
-            return self.param2 * np.sqrt(1 - (range / self.param1)**2)
+            return self.param2 * np.sqrt(1 - (range / self.param1) ** 2)
 
-    def within_shape(self, x, y):
+    def within_shape(self, x: float, y: float) -> bool:
         if x > self.max_limit:
             return False
         else:
             return y < self.eq(x)
 
-    def set_radius(self, R):
+    def set_radius(self, R: float):
         if self.shape == "Circle":
             self.param1 = R
             self.max_limit = R
         else:
             print("Can not set radius of non-circular shape")
 
-    def set_ellipse_axis(self, a, b):
+    def set_ellipse_axis(self, a: float, b: float):
         if self.shape == "Ellipse":
             self.param1 = a
             self.param2 = b
@@ -48,36 +55,41 @@ class Shape:
         else:
             print("Can not set radius of non-elliptical shape")
 
-def gen_circle(radius):
-    collider = Shape("Circle")
+
+def gen_circle(radius: float) -> Shape:
+    collider = Collider("Circle")
     collider.set_radius(radius)
     return collider
 
-def gen_ellipse(axis1, axis2):
-    collider = Shape("Ellipse")
+
+def gen_ellipse(axis1: float, axis2: float) -> Shape:
+    collider = Collider("Ellipse")
     collider.set_ellipse_axis(axis1, axis2)
     return collider
 
-def shape_coords(collider, data_points=100):
+
+def shape_coords(collider: Shape, data_points: int = 100):
     collider.gen_range(data_points)
     x = collider.get_range()
     y = collider.eq(x)
     return x, y
 
-def plot_shape(x, y):
-    max_x = np.max(np.abs(x))
-    max_y = np.max(np.abs(y))
+
+def plot_shape(x: np.ndarray, y: np.ndarray):
+    max_x: float = np.max(np.abs(x))
+    max_y: float = np.max(np.abs(y))
 
     plt.figure()
-    plt.axis('scaled')
-    plt.xlim(-max_x, 1.1*h+max_x)
-    plt.ylim(-max_y, 1.1*h+max_y)
+    plt.axis("scaled")
+    plt.xlim(-max_x, 1.1 * h + max_x)
+    plt.ylim(-max_y, 1.1 * h + max_y)
     plt.xlabel("x")
     plt.ylabel("y")
     plt.title("Simulation of Bounces")
 
-    plt.plot(x, y, 'r', linewidth=5)
-    plt.plot(x, -y, 'r', linewidth=5)
+    plt.plot(x, y, "r", linewidth=5)
+    plt.plot(x, -y, "r", linewidth=5)
+
 
 def simulate_bounces(collider, h, d, v_x, v_y):
 
@@ -89,7 +101,7 @@ def simulate_bounces(collider, h, d, v_x, v_y):
     s_x = d
     s_y = collider.eq(d) + h
 
-    n = int(endTime/dt)
+    n = int(endTime / dt)
     x_arr = np.zeros(n)
     y_arr = np.zeros(n)
 
@@ -111,9 +123,11 @@ def simulate_bounces(collider, h, d, v_x, v_y):
 
     return x_arr, y_arr
 
+
 def plot_bounces(x, y):
-    plt.plot(x, y, 'b.')
+    plt.plot(x, y, "b.")
     plt.show()
+
 
 if __name__ == "__main__":
 
